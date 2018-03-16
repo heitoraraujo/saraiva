@@ -87,6 +87,7 @@ public class BookController {
     public void delete(@PathVariable("code") long code,
                        @RequestParam(required = false, value = "lang") String lang) {
         business.delete(code);
+
     }
 
 }

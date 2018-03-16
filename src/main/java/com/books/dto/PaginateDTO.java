@@ -12,7 +12,6 @@ import java.util.Optional;
 @Setter
 public class PaginateDTO<Item> {
 
-    private Long totalOffersMarkets;
     private Long total;
     private Integer pages;
     private Long totalPages;

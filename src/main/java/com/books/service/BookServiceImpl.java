@@ -22,6 +22,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 
@@ -36,9 +37,6 @@ public class BookServiceImpl implements BookService {
 
     @Autowired
     private BookDAO bookDAO;
-
-    @Value("${limit.pagination.max.size}")
-    private Integer MAX_LIMIT_SIZE;
 
     private BookRepository repository() {
         return bookDAO.getRepository();
@@ -63,13 +61,7 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public Page<Book> getCollections(PageParam pageParam, BookFilterData data) {
-        CbcValidator<FieldErrorMessage> validator = validateMaxLimit(pageParam);
-
-        if (validator.hasErrors()) {
-            throw new CbcFieldValidationException(validator.errors(), HttpStatus.BAD_REQUEST);
-        }
-
-        return bookDAO.getCollections(pageParam, data);
+         return bookDAO.getCollections(pageParam, data);
     }
 
     @Override
@@ -88,14 +80,17 @@ public class BookServiceImpl implements BookService {
             throw new CbcFieldValidationException(validator.errors(), HttpStatus.BAD_REQUEST);
         }
 
-        Book actual = repository().findOne(code);
+        return Optional.ofNullable(repository().findOne(code))
+                .map(actual -> {
+                    actual.setMarca(book.getMarca());
+                    actual.setNome(book.getNome());
+                    actual.setSku(book.getSku());
+                    actual.setPreco(book.getPreco());
+                    return  repository().save(actual);
+                })
+                .orElse(null);
 
-        actual.setMarca(book.getMarca());
-        actual.setNome(book.getNome());
-        actual.setSku(book.getSku());
-        actual.setPreco(book.getPreco());
 
-        return repository().save(actual);
 
     }
 
@@ -123,9 +118,5 @@ public class BookServiceImpl implements BookService {
 
     }
 
-    private CbcValidator<FieldErrorMessage> validateMaxLimit(PageParam pageParam) {
-        return ensureThat()
-                .assertTrue(pageParam.getLimit() <= MAX_LIMIT_SIZE, createFieldError("limit", messageService.getMessage("limit.max.size")));
-    }
 
 }
