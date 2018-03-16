@@ -74,7 +74,7 @@ public class BookServiceImpl implements BookService {
     @Override
     public Book update(Book book, Long code) {
 
-        CbcValidator<FieldErrorMessage> validator = validateBook(book);
+        CbcValidator<FieldErrorMessage> validator = validateBookUpdate(book);
 
         if (validator.hasErrors()) {
             throw new CbcFieldValidationException(validator.errors(), HttpStatus.BAD_REQUEST);
