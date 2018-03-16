@@ -74,7 +74,7 @@ public class BookServiceImpl implements BookService {
     @Override
     public Book update(Book book, Long code) {
 
-        CbcValidator<FieldErrorMessage> validator = validateBookUpdate(book);
+        CbcValidator<FieldErrorMessage> validator = validateBook(book);
 
         if (validator.hasErrors()) {
             throw new CbcFieldValidationException(validator.errors(), HttpStatus.BAD_REQUEST);
@@ -88,7 +88,6 @@ public class BookServiceImpl implements BookService {
                     return  repository().save(actual);
                 })
                 .orElse(null);
-
 
 
     }
@@ -117,11 +116,5 @@ public class BookServiceImpl implements BookService {
 
     }
 
-    private CbcValidator validateBookUpdate(Book book) {
-        return ensureThat()
-                .assertFalse(book.getMarca() == null, createFieldError("sku", messageService.getMessage("marca.require.book")))
-                .assertFalse(book.getPreco() == null, createFieldError("sku", messageService.getMessage("preco.require.book")))
-                .assertFalse(book.getNome() == null, createFieldError("nome", messageService.getMessage("nome.require.book")));
 
-    }
 }
