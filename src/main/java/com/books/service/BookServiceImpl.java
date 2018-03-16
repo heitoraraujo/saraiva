@@ -49,7 +49,7 @@ public class BookServiceImpl implements BookService {
         CbcValidator<FieldErrorMessage> validator = validateBook(book);
 
         validator.assertFalse(skuAlreadyExist(book.getSku()),
-                createFieldError("sku", messageService.getMessage("sky.require.book")));
+                createFieldError("sku", messageService.getMessage("sku.already.exist")));
 
         if (validator.hasErrors()) {
             throw new CbcFieldValidationException(validator.errors(), HttpStatus.BAD_REQUEST);
@@ -84,7 +84,6 @@ public class BookServiceImpl implements BookService {
                 .map(actual -> {
                     actual.setMarca(book.getMarca());
                     actual.setNome(book.getNome());
-                    actual.setSku(book.getSku());
                     actual.setPreco(book.getPreco());
                     return  repository().save(actual);
                 })
@@ -118,5 +117,11 @@ public class BookServiceImpl implements BookService {
 
     }
 
+    private CbcValidator validateBookUpdate(Book book) {
+        return ensureThat()
+                .assertFalse(book.getMarca() == null, createFieldError("sku", messageService.getMessage("marca.require.book")))
+                .assertFalse(book.getPreco() == null, createFieldError("sku", messageService.getMessage("preco.require.book")))
+                .assertFalse(book.getNome() == null, createFieldError("nome", messageService.getMessage("nome.require.book")));
 
+    }
 }
